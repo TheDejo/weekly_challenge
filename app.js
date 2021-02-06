@@ -1,6 +1,10 @@
 const form = document.querySelector('#form');
 const search = document.querySelector('.input');
 const container = document.querySelector('.grid-container');
+const modalContainer = document.querySelector('.modal-container');
+const cancel = document.querySelector('.cancel');
+
+let photoData = [];
 
 // Get photos
 async function getPhotos(query) {
@@ -10,11 +14,14 @@ async function getPhotos(query) {
   const response = await axios.get(apiUrl);
   const data = response.data.results;
 
+  photoData = [...data];
+  console.log(data);
+
   data.forEach(photo => {
     showImages(photo);
   });
 
-  console.log(data);
+  // console.log(photoData);
 }
 
 // Build UI
@@ -43,3 +50,38 @@ form.addEventListener('submit', e => {
 });
 
 window.addEventListener('load', getPhotos('african'));
+
+//  Modal
+
+container.addEventListener('click', async e => {
+  console.log(e.target.id);
+
+  let photo = photoData.find(photo => {
+    return e.target.id == photo.id;
+  });
+
+  let template = `
+      <div class="modal">
+        <div class="modal-img">
+          <img src=${photo.urls.regular} alt="">
+        </div>
+        <div class="modal-text">
+          <h3>${photo.user.first_name} ${photo.user.last_name}</h3>
+          <span>${
+            photo.user.location ? photo.user.location : 'Somewhere on earth'
+          }</span>
+        </div>
+      </div>
+`;
+
+  modalContainer.style.display = 'flex';
+
+  cancel.style.display = 'block';
+  modalContainer.insertAdjacentHTML('beforeend', template);
+});
+
+cancel.addEventListener('click', () => {
+  cancel.style.display = 'none';
+  modalContainer.style.display = 'none';
+  modalContainer.innerHTML = '';
+});
