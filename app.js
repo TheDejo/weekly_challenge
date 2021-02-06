@@ -3,7 +3,9 @@ const search = document.querySelector('.input');
 const container = document.querySelector('.grid-container');
 const modalContainer = document.querySelector('.modal-container');
 const cancel = document.querySelector('.cancel');
+const lazyGrid = document.querySelectorAll('.grid-lazy');
 
+//Photo data from api
 let photoData = [];
 
 // Get photos
@@ -14,14 +16,18 @@ async function getPhotos(query) {
   const response = await axios.get(apiUrl);
   const data = response.data.results;
 
-  photoData = [...data];
-  console.log(data);
+  // Lazy loading
+  lazyGrid.forEach(cur => {
+    cur.style.display = 'none';
+  });
 
+  //Populate photo data
+  photoData = [...data];
+
+  //Render UI
   data.forEach(photo => {
     showImages(photo);
   });
-
-  // console.log(photoData);
 }
 
 // Build UI
@@ -43,16 +49,18 @@ function showImages(photo) {
   container.insertAdjacentHTML('beforeend', template);
 }
 
+//Submit EventListener
 form.addEventListener('submit', e => {
   e.preventDefault();
   container.innerHTML = '';
   getPhotos(search.value);
 });
 
+//Load African Images by default
 window.addEventListener('load', getPhotos('african'));
 
-//  Modal
 
+//  Modal
 container.addEventListener('click', async e => {
   console.log(e.target.id);
 
